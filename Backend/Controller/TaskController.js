@@ -78,7 +78,7 @@ const createTask = asyncHandler(async (req, res) => {
       throw new Error('Task not found');
     }
   });
-    
+
 // @desc get all tasks
 // @route GET /api/tasks
 
@@ -140,6 +140,7 @@ const getAllTasks = asyncHandler(async (req, res) => {
   
   
   // @desc filter or search task
+  // @route  GET /api/tasks/filter?search={search}
   const filterTasks = asyncHandler(async (req, res) => {
     const { date, status, keyword } = req.query;
   

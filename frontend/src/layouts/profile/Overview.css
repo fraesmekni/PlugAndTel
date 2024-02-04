@@ -1,0 +1,12 @@
+/* Overview.css */
+
+.taskContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px; /* Adjust the gap as needed */
+  }
+  
+  .taskItem {
+    flex: 1;
+  }
+  
