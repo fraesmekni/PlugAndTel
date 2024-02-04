@@ -21,6 +21,7 @@ import team4 from "assets/images/team-4.jpg";
 
 function Overview() {
   const [data, setData] = useState([]);
+  const [selectedTask, setSelectedTask] = useState(null);
   const { deleteTask } = useDeleteTask();
 
   useEffect(() => {
@@ -40,12 +41,41 @@ function Overview() {
     setData((prevData) => [...prevData, newTask]);
   };
 
+  const handleEditTask = (task) => {
+    setSelectedTask(task);
+  };
+
+  const handleUpdateTask = async (updatedTaskData) => {
+    console.log("Updating task:", updatedTaskData);
+    try {
+      if (!updatedTaskData._id) {
+        console.error("Task ID is undefined. Cannot update task.");
+        return;
+      }
+      const response = await axios.put(
+        `http://localhost:5000/api/tasks/${updatedTaskData._id}`,
+        updatedTaskData
+      );
+      if (response.status === 200) {
+        setData((prevData) =>
+          prevData.map((task) => (task._id === updatedTaskData._id ? response.data : task))
+        );
+        setSelectedTask(null);
+      } else {
+        console.error("Error updating task:", response.data.message);
+      }
+    } catch (error) {
+      console.error("Error updating task:", error);
+    }
+  };
+
   const handleDeleteTask = async (taskId) => {
     try {
       const response = await axios.delete(`http://localhost:5000/api/tasks/delete/${taskId}`);
 
       if (response.status === 200) {
         setData((prevData) => prevData.filter((task) => task._id !== taskId));
+        setSelectedTask(null);
       } else {
         console.error("Error deleting task:", response.data.message);
       }
@@ -128,29 +158,64 @@ function Overview() {
                       >
                         <Button
                           variant="contained"
+                          color="info"
+                          onClick={() => handleEditTask(task)}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          variant="contained"
                           color="error"
                           onClick={() => handleDeleteTask(task._id)}
                         >
                           Delete
                         </Button>
-                        <DefaultProjectCard
-                          image={tssk}
-                          label={task.deadline}
-                          title={task.title}
-                          description={task.description}
-                          action={{
-                            type: "internal",
-                            route: "/pages/profile/profile-overview",
-                            color: "info",
-                            label: `${task.status}`,
-                          }}
-                          authors={[
-                            { image: team1, name: "Elena Morison" },
-                            { image: team2, name: "Ryan Milly" },
-                            { image: team3, name: "Nick Daniel" },
-                            { image: team4, name: "Peterson" },
-                          ]}
-                        />
+                        {selectedTask && selectedTask._id === task._id ? (
+                          <div>
+                            {/* Display input fields for updating task */}
+                            <input
+                              type="text"
+                              value={selectedTask.title}
+                              onChange={(e) =>
+                                setSelectedTask({ ...selectedTask, title: e.target.value })
+                              }
+                            />
+                            <input
+                              type="text"
+                              value={selectedTask.description}
+                              onChange={(e) =>
+                                setSelectedTask({ ...selectedTask, description: e.target.value })
+                              }
+                            />
+                            {/* Add other fields as needed */}
+                            <Button
+                              variant="contained"
+                              color="info"
+                              onClick={() => handleUpdateTask(selectedTask)}
+                            >
+                              Save
+                            </Button>
+                          </div>
+                        ) : (
+                          <DefaultProjectCard
+                            image={tssk}
+                            label={task.deadline}
+                            title={task.title}
+                            description={task.description}
+                            action={{
+                              type: "internal",
+                              route: "/pages/profile/profile-overview",
+                              color: "info",
+                              label: `${task.status}`,
+                            }}
+                            authors={[
+                              { image: team1, name: "Elena Morison" },
+                              { image: team2, name: "Ryan Milly" },
+                              { image: team3, name: "Nick Daniel" },
+                              { image: team4, name: "Peterson" },
+                            ]}
+                          />
+                        )}
                       </Grid>
                     )}
                   </Draggable>
