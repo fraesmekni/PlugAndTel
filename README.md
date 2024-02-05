@@ -28,7 +28,7 @@ This project is a task management application built with a MERN (MongoDB, Expres
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/fraesmekni/PlugAndTel/task-management-app.git
+   git clone https://github.com/fraesmekni/PlugAndTel.git
    cd task-management-app
 cd backend
 npm install
