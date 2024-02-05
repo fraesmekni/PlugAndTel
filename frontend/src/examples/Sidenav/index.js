@@ -189,7 +189,7 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
           color={sidenavColor}
           fullWidth
         >
-          upgrade to pro
+          Fares Mekni
         </MDButton>
       </MDBox>
     </SidenavRoot>

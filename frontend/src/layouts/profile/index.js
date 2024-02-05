@@ -41,7 +41,7 @@ function Overview() {
       status: filterStatusValue,
     });
   }, []);
-
+  //consommation get tasks
   const fetchData = async () => {
     try {
       const response = await axios.get("http://localhost:5000/api/tasks/");
@@ -50,7 +50,7 @@ function Overview() {
       console.error("Error fetching tasks:", error);
     }
   };
-
+  //consommation filter tasks
   const fetchTasks = async (filters) => {
     try {
       const response = await axios.get("http://localhost:5000/api/tasks/filter", {
@@ -191,8 +191,8 @@ function Overview() {
           Search
         </Button>
       </MDBox>
-      <Grid container spacing={1} direction="row">
-        <Grid item xs={12} md={6} xl={3} direction="row">
+      <Grid container spacing={1}>
+        <Grid item xs={12} md={6} xl={3}>
           <MDBox pt={2} px={2} lineHeight={1.25}>
             <MDTypography variant="h6" fontWeight="medium">
               Tasks
@@ -210,7 +210,7 @@ function Overview() {
           </MDBox>
         </Grid>
         <DragDropContext onDragEnd={onDragEnd}>
-          <Droppable droppableId="tasks" direction="row">
+          <Droppable droppableId="tasks">
             {(provided) => (
               <div ref={provided.innerRef} {...provided.droppableProps}>
                 {data.map((task, index) => (

@@ -24,5 +24,5 @@ describe('Tests unitaires pour le backend', () => {
     expect(response.body).toBeInstanceOf(Array);
   });
 
-  // Vous pouvez ajouter d'autres tests complexes en fonction de l'application
+  
 });
