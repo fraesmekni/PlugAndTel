@@ -5,6 +5,11 @@ import MDInput from "components/MDInput";
 import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";
 import axios from "axios";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import { FormControl } from "@mui/material";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const AddTaskForm = () => {
   const [taskData, setTaskData] = useState({
@@ -25,9 +30,7 @@ const AddTaskForm = () => {
 
   const handleAddTask = async () => {
     try {
-      // Add task to the database using your API endpoint
       const response = await axios.post("http://localhost:5000/api/tasks/createTask", taskData);
-      // Reset form data
       setTaskData({
         title: "",
         description: "",
@@ -37,7 +40,12 @@ const AddTaskForm = () => {
       });
       console.log("Task added:", response.data);
     } catch (error) {
-      console.error("Error adding task:", error);
+      if (error.response && error.response.status === 400) {
+        // Task with the same order already exists, show a notification
+        toast.error("A task with the same order already exists. Please choose a different order.");
+      } else {
+        console.error("Error adding task:", error);
+      }
     }
   };
 
@@ -77,13 +85,29 @@ const AddTaskForm = () => {
         />
       </MDBox>
       <MDBox mb={2}>
+        <FormControl fullWidth variant="standard">
+          Status
+          <Select
+            label="Status"
+            name="status"
+            variant="standard"
+            value={taskData.status}
+            onChange={handleInputChange}
+          >
+            <MenuItem value="In Progress">In Progress</MenuItem>
+            <MenuItem value="Done">Done</MenuItem>
+            <MenuItem value="Uncompleted">Uncompleted</MenuItem>
+          </Select>
+        </FormControl>
+      </MDBox>
+      <MDBox mb={2}>
         <MDInput
-          type="text"
-          name="status"
-          label="Status"
+          type="number"
+          name="order"
+          label="Order"
           variant="standard"
           fullWidth
-          value={taskData.status}
+          value={taskData.order}
           onChange={handleInputChange}
         />
       </MDBox>
@@ -92,6 +116,7 @@ const AddTaskForm = () => {
           Add Task
         </MDButton>
       </MDBox>
+      <ToastContainer />
     </MDBox>
   );
 };

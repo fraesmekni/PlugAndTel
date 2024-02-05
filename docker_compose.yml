@@ -2,13 +2,16 @@ version: '3'
 services:
   app:
     build:
-      context: .
+      context: ./Backend
       dockerfile: Dockerfile
     ports:
       - "5000:5000"
+    environment : 
+      ROOT_PASSWORD : idg97eHsgH74c2zN  
     depends_on:
       - mongo
   mongo:
+    container_name: mongo-container
     image: mongo
     ports:
       - "27017:27017"

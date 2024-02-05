@@ -9,6 +9,10 @@ const TacheSchema = mongoose.Schema({
         enum: ['In Progress', 'Done', 'Uncompleted'],
     },
     order: { type: Number },
+    // order: {
+    //     type: Number,
+    //     required: true,
+    //   },
 });
 
 module.exports = mongoose.model('Tache', TacheSchema);

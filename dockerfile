@@ -1,5 +1,8 @@
 # Utiliser l'image Node.js
 FROM node:14
+FROM mongo:latest
+
+# Ajoutez des configurations ou des scripts d'initialisation si nécessaire
 
 # Créer le répertoire de travail
 WORKDIR /app
@@ -17,4 +20,4 @@ COPY . .
 EXPOSE 5000
 
 # Commande pour démarrer l'application
-CMD ["npm", "start"]
+CMD ["nodemon", "server"]

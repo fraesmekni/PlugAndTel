@@ -5,79 +5,92 @@ const Task = require('../model/Tache')
 // @route   POST /api/tasks/createTask
 
 const createTask = asyncHandler(async (req, res) => {
-    const {  
-      title,
-      description,
-      deadline,
-      status,
-      order
-    } = req.body;
-  
-    if (!title || !description || !deadline || !status) {
-      res.status(400).json({ message: "Please add all fields" });
-      throw new Error("Please add all fields");
-    }
-  
-    const task = await Task.create({
-      title,
-      description,
-      deadline,
-      status,
-      order,
-    });
-  
-    if (task) {
-      res.status(201).json({
-        _id: task.id,
-        title: task.title,
-        description: task.description,
-        deadline: task.deadline,
-        status: task.status,
-        order: task.order,
-      });
-    } else {
-      res.status(400).json({ message: "Invalid task data" });
-      throw new Error("Invalid task data");
-    }
+  const {  
+    title,
+    description,
+    deadline,
+    status,
+    order
+  } = req.body;
+
+  if (!title || !description || !deadline || !status) {
+    res.status(400).json({ message: "Please add all fields" });
+    throw new Error("Please add all fields");
+  }
+
+  // Check if a task with the same order already exists
+  const existingTask = await Task.findOne({ order });
+
+  if (existingTask) {
+    res.status(400).json({ message: "A task with the same order already exists. Please choose a different order." });
+    throw new Error("A task with the same order already exists. Please choose a different order.");
+  }
+
+  const task = await Task.create({
+    title,
+    description,
+    deadline,
+    status,
+    order,
   });
+
+  if (task) {
+    res.status(201).json({
+      _id: task.id,
+      title: task.title,
+      description: task.description,
+      deadline: task.deadline,
+      status: task.status,
+      order: task.order,
+    });
+  } else {
+    res.status(400).json({ message: "Invalid task data" });
+    throw new Error("Invalid task data");
+  }
+});
 
 
 
 
   // @desc Update task
   // @route PUT /api/tasks/:id
-  const updateTask = asyncHandler(async (req, res) => {
-    console.log('req.body:', req.body); 
-  
-    const { title, description, deadline, status, order } = req.body;  
-    
-  
-    const task = await Task.findById(req.params.id);
-  
-    if (task) {
-      task.title = title;
+  // @desc Update task
+// @route PUT /api/tasks/:id
+const updateTask = asyncHandler(async (req, res) => {
+  const { title, description, deadline, status, order } = req.body;
+
+  const task = await Task.findById(req.params.id);
+
+  if (task) {
+    task.title = title;
+
+    // Check if description is present in the request body
+    if (description !== undefined) {
       task.description = description;
-      task.deadline = deadline;
-      task.status = status;
-      task.order = order;
-  
-      const updatedTask = await task.save();
-  
-      if (updatedTask) {
-        res.status(200).json({
-          _id: updatedTask.id,
-          title: updatedTask.title,
-          description: updatedTask.description,
-          deadline: updatedTask.deadline,
-          status: updatedTask.status,
-         order:updatedTask.order,
-        });
-      }
-    } else {
-      res.status(404).json({ message: 'Task not found' });
-      throw new Error('Task not found');
     }
-  });
+
+    task.deadline = deadline;
+    task.status = status;
+    task.order = order;
+
+    const updatedTask = await task.save();
+
+    if (updatedTask) {
+      res.status(200).json({
+        _id: updatedTask.id,
+        title: updatedTask.title,
+        description: updatedTask.description,
+        deadline: updatedTask.deadline,
+        status: updatedTask.status,
+        order: updatedTask.order,
+      });
+    }
+  } else {
+    res.status(404).json({ message: 'Task not found' });
+    throw new Error('Task not found');
+  }
+});
+
 
 // @desc get all tasks
 // @route GET /api/tasks
@@ -128,7 +141,7 @@ const getAllTasks = asyncHandler(async (req, res) => {
   
     // Use findOneAndDelete instead of remove
     const result = await Task.findOneAndDelete({ _id: taskId });
-  
+  console.log(result)
     if (result) {
       res.status(200).json({ message: 'Task deleted successfully' });
     } else {
@@ -186,7 +199,26 @@ const getAllTasks = asyncHandler(async (req, res) => {
     }
   });
   
-  
+  // @desc Update task order
+// @route PUT /api/tasks/updateOrder
+const updateTaskOrder = asyncHandler(async (req, res) => {
+  const newOrder = req.body.newOrder;
+
+  // Assuming the newOrder is an array of objects with _id and order properties
+  try {
+    // Update the order in the database
+    await Promise.all(newOrder.map(async (task) => {
+      await Task.findByIdAndUpdate(task._id, { order: task.order });
+    }));
+
+    // Fetch and return the updated tasks
+    const updatedTasks = await Task.find().sort('order');
+    res.status(200).json(updatedTasks);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
   module.exports = {
-    createTask,updateTask,getAllTasks, getTaskById , deleteTask,filterTasks
+    createTask,updateTask,getAllTasks, getTaskById , deleteTask,filterTasks,updateTaskOrder
   }

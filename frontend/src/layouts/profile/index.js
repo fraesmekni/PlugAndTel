@@ -16,6 +16,7 @@ import Footer from "examples/Footer";
 import DefaultProjectCard from "examples/Cards/ProjectCards/DefaultProjectCard";
 import AddTaskForm from "layouts/AddTask/AddTaskForm";
 import useDeleteTask from "layouts/deleteTask/useDeleteTask";
+import { FormControl } from "@mui/material";
 
 // Images
 import tssk from "assets/images/tsk.jpg";
@@ -257,6 +258,20 @@ function Overview() {
                               }
                             />
                             {/* Add other fields as needed */}
+                            <FormControl fullWidth variant="standard">
+                              Status
+                              <Select
+                                label="Status"
+                                value={selectedTask.status}
+                                onChange={(e) =>
+                                  setSelectedTask({ ...selectedTask, status: e.target.value })
+                                }
+                              >
+                                <MenuItem value="In Progress">In Progress</MenuItem>
+                                <MenuItem value="Done">Done</MenuItem>
+                                <MenuItem value="Uncompleted">Uncompleted</MenuItem>
+                              </Select>
+                            </FormControl>
                             <Button
                               variant="contained"
                               color="info"
